@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const passport = require("passport");
 const cors = require("cors");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 require("./config/passport");
 
 const app = express();
@@ -20,9 +21,13 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      collectionName: "sessions",
+    }),
     cookie: {
       httpOnly: true,
-      secure: true,
+      secure: false,
       maxAge: 24 * 60 * 60 * 1000,
     },
   })
