@@ -4,20 +4,27 @@ const passport = require("passport");
 router.get("/google", passport.authenticate("google", { scope: ["profile"] }));
 
 router.get("/google/callback", passport.authenticate("google"), (req, res) => {
-  res.redirect("http://localhost:3000");
+  res.redirect("http://localhost:5173");
 });
 
 router.get("/logout", (req, res, next) => {
-  req.logout((err) => {
+  req.logout(function (err) {
     if (err) {
       return next(err);
     }
-    res.redirect("http://localhost:3000");
+    req.session.destroy(() => {
+      res.clearCookie("connect.sid");
+      res.redirect("http://localhost:5173");
+    });
   });
 });
 
 router.get("/current_user", (req, res) => {
-  res.send(req.user);
+  if (req.user) {
+    res.json(req.user);
+  } else {
+    res.json({});
+  }
 });
 
 module.exports = router;
